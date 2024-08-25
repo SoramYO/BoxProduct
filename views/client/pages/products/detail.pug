@@ -1,0 +1,52 @@
+extends ../../layouts/default.pug
+include ../../mixins/box-head.pug
+include ../../mixins/alert.pug
+
+block main
+    +alert-success()
+    +alert-error()
+
+    .product-detail
+        .container.my-5
+            .row
+                .col-md-6
+                    .inner-thumb
+                        img.img-fluid.rounded.shadow-sm(src=product.thumbnail, alt=product.title)
+                .col-md-6
+                    h1.inner-title.mb-3 #{product.title}
+
+                    if product.category
+                        div.inner-category.mb-3
+                            span.font-weight-bold Danh mục: 
+                            a(href=`/products/${product.category.slug}` class="text-primary ml-2") #{product.category.title}
+
+                    if product.priceNew
+                        h3.inner-price-new.text-success.mb-2 #{product.priceNew}$
+
+                    if product.price
+                        h4.inner-price-old.text-muted.text-decoration-line-through #{product.price}$
+
+                    if product.discountPercentage
+                        h5.inner-percent.text-danger.mb-3 Giảm tới 
+                        span.font-weight-bold #{product.discountPercentage}%
+
+                    if product.stock
+                        div.inner-stock.text-warning.mb-4
+                            span.font-weight-bold Còn lại: 
+                            span #{product.stock} sản phẩm
+
+                    form(
+                        action=`/cart/add/${product.id}`
+                        method="POST"
+                    )
+                        .form-group
+                            label(for="quantity") Số lượng:
+                            input#quantity.form-control(type="number" name="quantity" value="1" min="1", max=product.stock)
+
+                        button.btn.btn-success.btn-block.mt-4(type="submit") Thêm vào giỏ hàng
+
+            .row.mt-5
+                .col-md-12
+                    +box-head("Mô tả sản phẩm")
+                    p.inner-desc.lead.mt-3 !{product.description}
+

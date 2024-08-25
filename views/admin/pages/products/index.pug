@@ -1,0 +1,138 @@
+extends  ../../layouts/default.pug
+include ../../mixins/filter.pug
+include ../../mixins/search.pug
+include ../../mixins/pagination.pug
+include ../../mixins/alert.pug
+include ../../mixins/changeset.pug
+
+block main
+  +alert-success(5000)
+
+  h1(class="mb-4") Danh sách sản phẩm
+
+
+  .card.mb-3
+  .card-header Thao tác
+  .card-body
+    .row
+      .col-md-6.d-flex.flex-column.justify-content-between
+        .mb-3
+          +filter(filterStatus)
+        .mb-3
+          .form-group
+            label(for="sort") Sắp xếp theo
+            select#sort.form-control(name="sort", sort-select)
+              option(value="position-desc") Vị trí giảm dần
+              option(value="position-asc") Vị trí tăng dần
+              option(value="price-desc") Giá giảm dần
+              option(value="price-asc") Giá tăng dần
+              option(value="title-asc") Tiêu đề A - Z
+              option(value="title-desc") Tiêu đề Z - A
+            button.btn.btn-danger.mt-2(sort-clear) Clear
+      .col-md-6.d-flex.flex-column.justify-content-center
+        +search(keyword)
+
+
+  .card.mb-3
+    .card-header Danh sách
+    .card-body
+      .row
+        .col-8
+          +changeset(`/${ADMIN_PATH}/products/change-multi?_method=PATCH`)
+        .col-4
+          a(
+            href=`/${ADMIN_PATH}/products/create`
+            class="btn btn-outline-success"
+          ) + Thêm mới
+
+      table(
+        class="table table-hover table-sm"
+        checkbox-multi
+      )
+        thead
+          tr
+            td
+              input(type="checkbox" name="checkall")
+            th STT
+            th Hình ảnh
+            th Tiêu đề
+            th Giá
+            th Vị trí
+            th Trạng thái
+            th Tạo bởi
+            th Hành động
+
+        tbody
+          each item, index in products
+            tr
+              td
+                input(type="checkbox" name="id" value=item.id)
+              td #{index + 1}
+              td
+                if item.thumbnail
+                  img(
+                    src=item.thumbnail
+                    alt=item.title
+                    width="100px"
+                    height="auto"
+                  )
+                else if item.thumbnail.img
+                  img(src=`data:${item.thumbnail.img.contentType};base64,${item.thumbnail.img.data.toString('base64')}`, alt=item.title  width="100px" height="auto")
+              td #{item.title}
+              td #{item.price}$
+              td
+                input(
+                  name="position"
+                  value=item.position
+                  type="number"
+                  style="width: 60px;"
+                  min="1"
+                )
+              td
+                if(item.status == "active")
+                  button(
+                    button-change-status
+                    data-id=item.id
+                    data-status="inactive"
+                    class="badge badge-success"
+                  ) Hoạt động
+                else
+                  button(
+                    button-change-status
+                    data-id=item.id
+                    data-status="active"
+                    class="badge badge-danger"
+                  ) Dừng hoạt động
+              td
+                div #{item.createdByFullName}
+                div 
+              td
+                a(
+                  href=`/${ADMIN_PATH}/products/edit/${item.id}`
+                  class="btn btn-warning btn-sm"
+                ) Sửa
+                button(
+                  class="btn btn-danger btn-sm ml-1"
+                  button-delete
+                  data-id=item.id
+                ) Xóa
+                a(
+                  href=`/${ADMIN_PATH}/products/detail/${item.id}`
+                  class="btn btn-info btn-sm ml-1"
+                ) Chi tiết
+  +pagination(pagination)
+
+
+  form(
+    form-change-status
+    method="POST"
+    action=""
+    data-path="/admin/products/change-status"
+  )
+
+  form(
+    form-delete-item
+    method="POST"
+    action=""
+    data-path="/admin/products/delete"
+  )

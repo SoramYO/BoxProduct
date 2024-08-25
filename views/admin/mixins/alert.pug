@@ -1,0 +1,19 @@
+mixin alert-success(time)
+  if messages.success
+    .alert.alert-success(show-alert data-time=time)
+      | #{messages.success}
+      button.btn.btn-danger.btn-sm.btn-close-alert(close-alert) x
+      .progress-bar
+
+
+
+mixin alert-error()
+  - if (messages.error)
+    div(
+      class="alert alert-danger"
+      show-alert
+      data-time="3000"
+    )
+      | #{messages.error}
+      button.btn.btn-danger.btn-sm.btn-close-alert(close-alert) x
+      .progress-bar
