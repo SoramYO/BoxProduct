@@ -209,15 +209,17 @@ if (uploadImage) {
 
 // Remove image
 const removeImageButton = document.querySelector("[remove-image-button]");
-removeImageButton.addEventListener("click", () => {
-  const uploadImage = document.querySelector("[upload-image]");
-  if (uploadImage) {
-    const uploadImageInput = uploadImage.querySelector("[upload-image-input]");
-    const uploadImagePreview = uploadImage.querySelector("[upload-image-preview]");
-    uploadImageInput.value = "";  // Xóa giá trị của input file
-    uploadImagePreview.src = "";  // Xóa ảnh preview
-  }
-});
+if (removeImageButton) {
+  removeImageButton.addEventListener("click", () => {
+    const uploadImage = document.querySelector("[upload-image]");
+    if (uploadImage) {
+      const uploadImageInput = uploadImage.querySelector("[upload-image-input]");
+      const uploadImagePreview = uploadImage.querySelector("[upload-image-preview]");
+      uploadImageInput.value = "";  // Xóa giá trị của input file
+      uploadImagePreview.src = "";  // Xóa ảnh preview
+    }
+  })
+};
 
 // End Remove image
 

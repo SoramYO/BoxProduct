@@ -1,0 +1,21 @@
+extends  ../../layouts/default.pug
+include ../../mixins/filter.pug
+include ../../mixins/search.pug
+include ../../mixins/pagination.pug
+include ../../mixins/alert.pug
+include ../../mixins/changeset.pug
+include ../../mixins/sort.pug
+
+block main
+
+    h1(class="mb-4") Danh mục sản phẩm
+
+    .card.mb-3
+        .card-header Danh sách
+        .card-body
+            .row
+                .col-4
+                    a(
+                        href=`/${ADMIN_PATH}/products/create`
+                        class="btn btn-outline-success"
+                    ) + Thêm mới

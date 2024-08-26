@@ -4,6 +4,7 @@ include ../../mixins/search.pug
 include ../../mixins/pagination.pug
 include ../../mixins/alert.pug
 include ../../mixins/changeset.pug
+include ../../mixins/sort.pug
 
 block main
   +alert-success(5000)
@@ -12,27 +13,17 @@ block main
 
 
   .card.mb-3
-  .card-header Thao tác
-  .card-body
-    .row
-      .col-md-6.d-flex.flex-column.justify-content-between
-        .mb-3
-          +filter(filterStatus)
-        .mb-3
-          .form-group
-            label(for="sort") Sắp xếp theo
-            select#sort.form-control(name="sort", sort-select)
-              option(value="position-desc") Vị trí giảm dần
-              option(value="position-asc") Vị trí tăng dần
-              option(value="price-desc") Giá giảm dần
-              option(value="price-asc") Giá tăng dần
-              option(value="title-asc") Tiêu đề A - Z
-              option(value="title-desc") Tiêu đề Z - A
-            button.btn.btn-danger.mt-2(sort-clear) Clear
-      .col-md-6.d-flex.flex-column.justify-content-center
-        +search(keyword)
-
-
+    .card-header Thao tác
+    .card-body
+      .row
+        .col-md-6.d-flex.flex-column.justify-content-center
+          .mb-3
+            +filter(filterStatus)
+        .col-md-6.d-flex.flex-column.justify-content-center
+          +sort()
+        .col-md-6.d-flex.flex-column.justify-content-center
+          +search(keyword)
+  
   .card.mb-3
     .card-header Danh sách
     .card-body
@@ -69,14 +60,13 @@ block main
                 input(type="checkbox" name="id" value=item.id)
               td #{index + 1}
               td
-                if item.thumbnail
-                  img(
-                    src=item.thumbnail
-                    alt=item.title
-                    width="100px"
-                    height="auto"
-                  )
-                else if item.thumbnail.img
+                img(
+                  src=item.thumbnail
+                  alt=item.title
+                  width="100px"
+                  height="auto"
+                )
+                //if item.thumbnail.img
                   img(src=`data:${item.thumbnail.img.contentType};base64,${item.thumbnail.img.data.toString('base64')}`, alt=item.title  width="100px" height="auto")
               td #{item.title}
               td #{item.price}$

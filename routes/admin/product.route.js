@@ -5,7 +5,7 @@ const multer = require("multer");
 const path = require('path')
 const storageMulter = require("../../helpers/storageMulter");
 const validation = require("../../validates/admin/product.validate");
-const upload = multer({ storage: storageMulter() });
+const upload = multer();
 
 // const storage = multer.diskStorage({
 //     destination: (req, file, cb) => {

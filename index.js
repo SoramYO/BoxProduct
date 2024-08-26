@@ -9,6 +9,7 @@ const flash = require("express-flash");
 const cookieParser = require("cookie-parser");
 const expressSession = require("express-session");
 const systemConfig = require("./config/system");
+const path = require('path');
 dotenv.config();
 
 const app = express();
@@ -24,7 +25,8 @@ app.use(express.static(`${__dirname}/public`));
 app.use(methodOveride("_method"));
 //Set parser application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
-//Set parser application/json
+//TinyMCE
+app.use('/tinymce', express.static(path.join(__dirname, 'node_modules', 'tinymce')));
 
 app.locals.ADMIN_PATH = systemConfig.ADMIN_PATH;
 //Set flash

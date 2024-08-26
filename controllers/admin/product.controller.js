@@ -4,8 +4,10 @@ const filterStatusHelper = require("../../helpers/filterStatus");
 const searchHelper = require("../../helpers/search");
 const panigationHelper = require("../../helpers/pagination");
 const systemConfig = require('../../config/system')
+const uploadFileToFirebase = require('../../helpers/firebaseUpload');
 const fs = require('fs');
 const path = require('path');
+const sortHelper = require("../../helpers/sort");
 
 //[GET] /admin/products
 module.exports.index = async (req, res) => {
@@ -26,7 +28,9 @@ module.exports.index = async (req, res) => {
 
   const pagination = await panigationHelper(req.query, countProducts);
 
-  const products = await Product.find(find).skip(pagination.skip).limit(pagination.limit).sort({ position: "desc" }).populate('thumbnail');
+  const sort = await sortHelper(req.query);
+
+  const products = await Product.find(find).skip(pagination.skip).limit(pagination.limit).sort(sort).populate('thumbnail');
 
   res.render("admin/pages/products/index", {
     pageTitle: "Danh sách sản phẩm",
@@ -87,27 +91,36 @@ module.exports.createProduct = async (req, res) => {
   //   }
   // };
   // const image = await Image.create(imageObj);
-
-  const countProducts = await Product.countDocuments();
-
-
-  const product = new Product({
-    title: req.body.title,
-    description: req.body.description,
-    price: req.body.price ? parseInt(req.body.price) : 0,
-    discountPercentage: req.body.discountPercentage ? parseInt(req.body.discountPercentage) : 0,
-    stock: req.body.stock ? parseInt(req.body.stock) : 0,
-    //thumbnail: image._id,
-    thumbnail: req.body.thumbnail,
-    status: req.body.status,
-    position: req.body.position ? parseInt(req.body.position) : countProducts + 1,
-  });
-  await product.save();
+  try {
+    const countProducts = await Product.countDocuments();
+    let thumbnailUrl = null;
+    if (req.file) {
+      thumbnailUrl = await uploadFileToFirebase(req.file);
+    }
 
 
+    const product = new Product({
+      title: req.body.title,
+      description: req.body.description,
+      price: req.body.price ? parseInt(req.body.price) : 0,
+      discountPercentage: req.body.discountPercentage ? parseInt(req.body.discountPercentage) : 0,
+      stock: req.body.stock ? parseInt(req.body.stock) : 0,
+      //thumbnail: image._id,
+      thumbnail: thumbnailUrl,
+      status: req.body.status,
+      position: req.body.position ? parseInt(req.body.position) : countProducts + 1,
+    });
+    await product.save();
 
-  req.flash('success', `Thêm sản phẩm ${product.title} thành công`);
-  res.redirect(`/${systemConfig.ADMIN_PATH}/products`);
+
+
+    req.flash('success', `Thêm sản phẩm ${product.title} thành công`);
+    res.redirect(`/${systemConfig.ADMIN_PATH}/products`);
+  } catch (error) {
+    console.error('Error uploading file:', error);
+    req.flash('error', 'Có lỗi xảy ra khi thêm sản phẩm');
+    res.redirect('back');
+  }
 }
 
 //[GET] /admin/products/edit/:id
@@ -127,21 +140,32 @@ module.exports.edit = async (req, res) => {
 
 //[PUT] /admin/products/edit/:id
 module.exports.editProduct = async (req, res) => {
-  const id = req.params.id;
-  const product = await Product.findById(id);
+  try {
+    const id = req.params.id;
+    const product = await Product.findById(id);
 
-  product.title = req.body.title;
-  product.description = req.body.description;
-  product.price = req.body.price ? parseInt(req.body.price) : 0;
-  product.discountPercentage = req.body.discountPercentage ? parseInt(req.body.discountPercentage) : 0;
-  product.stock = req.body.stock ? parseInt(req.body.stock) : 0;
-  product.thumbnail = req.body.thumbnail;
-  product.status = req.body.status;
-  product.position = req.body.position ? parseInt(req.body.position) : 0;
+    let thumbnailUrl = null;
+    if (req.file) {
+      thumbnailUrl = await uploadFileToFirebase(req.file);
+    }
 
-  await product.save();
-  req.flash('success', `Chỉnh sửa sản phẩm ${product.title} thành công`);
-  res.redirect(`/${systemConfig.ADMIN_PATH}/products`);
+    product.title = req.body.title;
+    product.description = req.body.description;
+    product.price = req.body.price ? parseInt(req.body.price) : 0;
+    product.discountPercentage = req.body.discountPercentage ? parseInt(req.body.discountPercentage) : 0;
+    product.stock = req.body.stock ? parseInt(req.body.stock) : 0;
+    product.thumbnail = req.file ? thumbnailUrl : req.body.thumbnail;
+    product.status = req.body.status;
+    product.position = req.body.position ? parseInt(req.body.position) : 0;
+
+    await product.save();
+    req.flash('success', `Chỉnh sửa sản phẩm ${product.title} thành công`);
+    res.redirect(`/${systemConfig.ADMIN_PATH}/products`);
+  } catch (error) {
+    console.error('Error uploading file:', error.message);
+    req.flash('error', 'Có lỗi xảy ra khi chỉnh sửa sản phẩm');
+    res.redirect('back');
+  }
 }
 
 //[GET] /admin/products/detail/:id
