@@ -118,7 +118,7 @@ module.exports.createProduct = async (req, res) => {
     res.redirect(`/${systemConfig.ADMIN_PATH}/products`);
   } catch (error) {
     console.error('Error uploading file:', error.message);
-    req.flash('error', 'Có lỗi xảy ra khi thêm sản phẩm');
+    req.flash('error', 'Có lỗi xảy ra khi thêm sản phẩm', error.message);
     res.redirect('back');
   }
 }
