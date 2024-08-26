@@ -117,7 +117,7 @@ module.exports.createProduct = async (req, res) => {
     req.flash('success', `Thêm sản phẩm ${product.title} thành công`);
     res.redirect(`/${systemConfig.ADMIN_PATH}/products`);
   } catch (error) {
-    console.error('Error uploading file:', error);
+    console.error('Error uploading file:', error.message);
     req.flash('error', 'Có lỗi xảy ra khi thêm sản phẩm');
     res.redirect('back');
   }
