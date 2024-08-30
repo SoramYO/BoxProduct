@@ -23,6 +23,15 @@ block main
                 required
             )
         div(class="form-group")
+            label(for="parent") Danh mục
+            select.form-control(
+                name="product_category_id"
+                id="product_category_id"
+                class="form-control"
+            )
+                option(value="") Chọn danh mục
+                    +select-tree(productCategory)
+        div(class="form-group")
             label(for="desc") Mô tả
             textarea(
                 class="form-control"

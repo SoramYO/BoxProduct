@@ -309,3 +309,58 @@ if (dataRecords) {
   });
 }
 // End Data default Table Permissions
+
+
+
+
+
+const tablePermissions = document.querySelector("[table-permissions]");
+
+if (tablePermissions) {
+  const rows = tablePermissions.querySelectorAll("tbody tr");
+
+  // Iterate over each row
+  rows.forEach((row, rowIndex) => {
+    const fullPermissionCheckboxes = row.querySelectorAll('input[name="full_permission"]');
+
+    // Iterate over each full_permission checkbox in the row
+    fullPermissionCheckboxes.forEach(fullPermissionCheckbox => {
+      fullPermissionCheckbox.addEventListener("click", () => {
+        // Get the column index of the full_permission checkbox in this row
+        const columnIndex = Array.from(row.children).indexOf(fullPermissionCheckbox.closest("td"));
+
+        // Apply the same check/uncheck state to all checkboxes in this column across all rows
+        rows.forEach((r) => {
+          const checkbox = r.querySelector(`td:nth-child(${columnIndex + 1}) input[type="checkbox"]`);
+          if (checkbox) {
+            checkbox.checked = fullPermissionCheckbox.checked;
+          }
+        });
+      });
+    });
+  });
+
+  // Set up individual checkbox listeners for each column to update the corresponding full_permission checkbox
+  rows.forEach((row, rowIndex) => {
+    const checkboxes = row.querySelectorAll('input[type="checkbox"]:not([name="full_permission"])');
+
+    checkboxes.forEach((checkbox, index) => {
+      checkbox.addEventListener("click", () => {
+        // Get the column index for the clicked checkbox
+        const columnIndex = Array.from(row.children).indexOf(checkbox.closest("td"));
+
+        // Check if all checkboxes in this column are checked
+        const allChecked = Array.from(rows).every((r) => {
+          const cb = r.querySelector(`td:nth-child(${columnIndex + 1}) input[type="checkbox"]:not([name="full_permission"])`);
+          return cb ? cb.checked : true;
+        });
+
+        // Update the full_permission checkbox at the top of this column
+        const fullPermissionCheckboxInColumn = rows[0].querySelector(`td:nth-child(${columnIndex + 1}) input[name="full_permission"]`);
+        if (fullPermissionCheckboxInColumn) {
+          fullPermissionCheckboxInColumn.checked = allChecked;
+        }
+      });
+    });
+  });
+}

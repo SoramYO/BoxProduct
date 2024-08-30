@@ -8,6 +8,8 @@ const uploadFileToFirebase = require('../../helpers/firebaseUpload');
 const fs = require('fs');
 const path = require('path');
 const sortHelper = require("../../helpers/sort");
+const ProductCategory = require("../../models/product-category.model");
+const createTree = require("../../helpers/createTree");
 
 //[GET] /admin/products
 module.exports.index = async (req, res) => {
@@ -73,9 +75,15 @@ module.exports.changeMulti = async (req, res) => {
 
 }
 //[GET] /admin/products/create
-module.exports.create = (req, res) => {
+module.exports.create = async (req, res) => {
+  const categories = await ProductCategory.find({
+    deleted: false
+  });
+  const categoryTree = createTree(categories);
+
   res.render("admin/pages/products/create", {
     pageTitle: "Thêm sản phẩm",
+    productCategory: categoryTree,
   });
 }
 
@@ -101,12 +109,13 @@ module.exports.createProduct = async (req, res) => {
 
     const product = new Product({
       title: req.body.title,
+      product_category_id: req.body.product_category_id,
       description: req.body.description,
       price: req.body.price ? parseInt(req.body.price) : 0,
       discountPercentage: req.body.discountPercentage ? parseInt(req.body.discountPercentage) : 0,
       stock: req.body.stock ? parseInt(req.body.stock) : 0,
       //thumbnail: image._id,
-      thumbnail: thumbnailUrl,
+      thumbnail: req.file ? thumbnailUrl : req.body.thumbnail,
       status: req.body.status,
       position: req.body.position ? parseInt(req.body.position) : countProducts + 1,
     });
@@ -126,11 +135,16 @@ module.exports.createProduct = async (req, res) => {
 //[GET] /admin/products/edit/:id
 module.exports.edit = async (req, res) => {
   try {
+    const categories = await ProductCategory.find({
+      deleted: false
+    });
+    const categoryTree = createTree(categories);
     const id = req.params.id;
     const product = await Product.findById(id);
     res.render("admin/pages/products/edit", {
       pageTitle: "Chỉnh sửa sản phẩm",
       product: product,
+      productCategory: categoryTree,
     });
   } catch (err) {
     console.log('Error at get edit product', err);
@@ -150,6 +164,7 @@ module.exports.editProduct = async (req, res) => {
     }
 
     product.title = req.body.title;
+    product.product_category_id = req.body.product_category_id;
     product.description = req.body.description;
     product.price = req.body.price ? parseInt(req.body.price) : 0;
     product.discountPercentage = req.body.discountPercentage ? parseInt(req.body.discountPercentage) : 0;

@@ -1,0 +1,68 @@
+mixin table-tree(productCategory, level = 1)
+    each item in productCategory
+        - const prefix = Array(level + 1).join("-- ")
+        tr
+            td
+                input(type="checkbox" name="id" value=item.id)
+            td #{item.index}
+            td
+                img(
+                    src=item.thumbnail
+                    alt=item.title
+                    width="100px"
+                    height="auto"
+                )
+            td #{prefix} #{item.title}
+            td
+                input(
+                    name="position"
+                    value=item.position
+                    type="number"
+                    style="width: 60px;"
+                    min="1"
+                )
+            td
+                if item.status == "active"
+                    button(
+                        button-change-status
+                        data-id=item.id
+                        data-status="inactive"
+                        class="badge badge-success"
+                    ) Hoạt động
+                else
+                    button(
+                        button-change-status
+                        data-id=item.id
+                        data-status="active"
+                        class="badge badge-danger"
+                    ) Dừng hoạt động
+            td
+                a(
+                    href=`/${ADMIN_PATH}/product-category/edit/${item.id}`
+                    class="btn btn-warning btn-sm"
+                ) Sửa
+                button(
+                    class="btn btn-danger btn-sm ml-1"
+                    button-delete
+                    data-id=item.id
+                ) Xóa
+                a(
+                    href=`/${ADMIN_PATH}/product-category/detail/${item.id}`
+                    class="btn btn-info btn-sm ml-1"
+                ) Chi tiết
+        if item.children && item.children.length > 0
+            +table-tree(item.children, level + 1)
+
+    form(
+        form-change-status
+        method="POST"
+        action=""
+        data-path="/admin/product-category/change-status"
+    )
+
+    form(
+        form-delete-item
+        method="POST"
+        action=""
+        data-path="/admin/product-category/delete"
+    )

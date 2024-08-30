@@ -1,4 +1,4 @@
-mixin alert-success(time)
+mixin alert-success(time = 5000)
   if messages.success
     .alert.alert-success(show-alert data-time=time)
       | #{messages.success}

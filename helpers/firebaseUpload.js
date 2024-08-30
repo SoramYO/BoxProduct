@@ -1,5 +1,6 @@
 const admin = require('../config/firebase-admin');
 const bucket = admin.storage().bucket();
+const { ref, uploadBytes } = require('firebase/storage');
 
 async function uploadFileToFirebase(file) {
     const { originalname, buffer } = file;
@@ -14,6 +15,12 @@ async function uploadFileToFirebase(file) {
         });
 
         blobStream.on('finish', async () => {
+            //if bucket.name have space, replace it with %20
+            for (let i = 0; i < blob.name.length; i++) {
+                if (blob.name[i] === ' ') {
+                    blob.name = blob.name.replace(' ', '%20');
+                }
+            }
             const publicUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${blob.name}?alt=media`;
             resolve(publicUrl);
         });
