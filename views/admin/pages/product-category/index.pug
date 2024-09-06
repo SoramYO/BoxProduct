@@ -1,39 +1,58 @@
 extends  ../../layouts/default.pug
 include ../../mixins/table-tree.pug
 include ../../mixins/alert.pug
+include ../../mixins/filter.pug
+include ../../mixins/search.pug
+include ../../mixins/pagination.pug
+include ../../mixins/changeset.pug
+include ../../mixins/sort.pug
+
 block main
     +alert-error()
     +alert-success()
 
     h1(class="mb-4") Danh mục sản phẩm
+    .card.mb-3
+        .card-header Thao tác
+        .card-body
+            .row
+                .col-md-6.d-flex.flex-column.justify-content-center
+                    .mb-3
+                        +filter(filterStatus)
+                .col-md-6.d-flex.flex-column.justify-content-center
+                    +sort()
+                .col-md-6.d-flex.flex-column.justify-content-center
+                    +search(keyword)
 
     .card.mb-3
         .card-header Danh sách
         .card-body
             .row
-                .col-4
-                    a(
-                        href=`/${ADMIN_PATH}/product-category/create`
-                        class="btn btn-outline-success"
-                    ) + Thêm mới
-    .card.mb-3
-        .card-header Danh sách
-        .card-body
-            .row
-                table(
-                    class="table table-hover table-sm"
-                    checkbox-multi
-                )
-                    thead
-                        tr
-                            td
-                                input(type="checkbox" name="checkall")
-                            th STT
-                            th Hình ảnh
-                            th Tiêu đề
-                            th Vị trí
-                            th Trạng thái
-                            th Hành động
-                    tbody
-                        +table-tree(productCategory)
+                .col-8
+                    +changesetCategory(`/${ADMIN_PATH}/product-category/change-multi?_method=PATCH`)
+                .col-4.mb-3
+                    if(role.permissions.includes("product-category_create"))
+                        a(
+                            href=`/${ADMIN_PATH}/product-category/create`
+                            class="btn btn-outline-success"
+                        ) + Thêm mới
+
+            table(
+                class="table table-hover table-sm"
+                checkbox-multi
+            )
+                thead
+                    tr
+                        td
+                            input(type="checkbox" name="checkall")
+                        th STT
+                        th Hình ảnh
+                        th Tiêu đề
+                        th Vị trí
+                        th Trạng 
+                        th Tạo bởi
+                        th Người sửa cuối
+                        th Hành động
+                tbody
+                    +table-tree(productCategory)
 

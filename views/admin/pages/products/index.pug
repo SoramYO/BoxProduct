@@ -7,6 +7,7 @@ include ../../mixins/changeset.pug
 include ../../mixins/sort.pug
 
 block main
+  +alert-error()
   +alert-success()
 
   h1(class="mb-4") Danh sách sản phẩm
@@ -31,10 +32,11 @@ block main
         .col-8
           +changeset(`/${ADMIN_PATH}/products/change-multi?_method=PATCH`)
         .col-4
-          a(
-            href=`/${ADMIN_PATH}/products/create`
-            class="btn btn-outline-success"
-          ) + Thêm mới
+          if(role.permissions.includes("products_create"))
+            a(
+              href=`/${ADMIN_PATH}/products/create`
+              class="btn btn-outline-success"
+            ) + Thêm mới
 
       table(
         class="table table-hover table-sm"
@@ -51,6 +53,7 @@ block main
             th Vị trí
             th Trạng thái
             th Tạo bởi
+            th Người sửa cuối
             th Hành động
 
         tbody
@@ -79,37 +82,56 @@ block main
                   min="1"
                 )
               td
-                if(item.status == "active")
-                  button(
-                    button-change-status
-                    data-id=item.id
-                    data-status="inactive"
-                    class="badge badge-success"
-                  ) Hoạt động
-                else
-                  button(
-                    button-change-status
-                    data-id=item.id
-                    data-status="active"
-                    class="badge badge-danger"
-                  ) Dừng hoạt động
+                if(role.permissions.includes("products_change-status"))
+                  if(item.status == "active")
+                    button(
+                      button-change-status
+                      data-id=item.id
+                      data-status="inactive"
+                      class="badge badge-success"
+                    ) Hoạt động
+                  else
+                    button(
+                      button-change-status
+                      data-id=item.id
+                      data-status="active"
+                      class="badge badge-danger"
+                    ) Dừng hoạt động
               td
-                div #{item.createdByFullName}
-                div 
+                p #{item.createBy.fullName}
+                p
+                  if item.createBy.fullName
+                    | #{moment(item.createdAt).format("DD/MM/YYYY")}
+                    br
+                    | #{moment(item.createdAt).format("HH:mm:ss")}
+                  else
+                    |
               td
-                a(
-                  href=`/${ADMIN_PATH}/products/edit/${item.id}`
-                  class="btn btn-warning btn-sm"
-                ) Sửa
-                button(
-                  class="btn btn-danger btn-sm ml-1"
-                  button-delete
-                  data-id=item.id
-                ) Xóa
-                a(
-                  href=`/${ADMIN_PATH}/products/detail/${item.id}`
-                  class="btn btn-info btn-sm ml-1"
-                ) Chi tiết
+                p #{item.updateBy.fullName}
+                p
+                  if item.updateBy.fullName
+                    | #{moment(item.updatedAt).format("DD/MM/YYYY")}
+                    br
+                    | #{moment(item.updatedAt).format("HH:mm:ss")}
+                  else
+                    |
+              td
+                if(role.permissions.includes("products_edit"))
+                  a(
+                    href=`/${ADMIN_PATH}/products/edit/${item.id}`
+                    class="btn btn-warning btn-sm"
+                  ) Sửa
+                if(role.permissions.includes("products_delete"))
+                  button(
+                    class="btn btn-danger btn-sm ml-1"
+                    button-delete
+                    data-id=item.id
+                  ) Xóa
+                if(role.permissions.includes("products_view"))
+                  a(
+                    href=`/${ADMIN_PATH}/products/detail/${item.id}`
+                    class="btn btn-info btn-sm ml-1"
+                  ) Chi tiết
   +pagination(pagination)
 
 

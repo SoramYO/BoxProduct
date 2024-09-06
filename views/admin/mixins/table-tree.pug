@@ -22,34 +22,56 @@ mixin table-tree(productCategory, level = 1)
                     min="1"
                 )
             td
-                if item.status == "active"
-                    button(
-                        button-change-status
-                        data-id=item.id
-                        data-status="inactive"
-                        class="badge badge-success"
-                    ) Hoạt động
-                else
-                    button(
-                        button-change-status
-                        data-id=item.id
-                        data-status="active"
-                        class="badge badge-danger"
-                    ) Dừng hoạt động
+                if(role.permissions.includes("product-category_change-status"))
+                    if item.status == "active"
+                        button(
+                            button-change-status
+                            data-id=item.id
+                            data-status="inactive"
+                            class="badge badge-success"
+                        ) Hoạt động
+                    else
+                        button(
+                            button-change-status
+                            data-id=item.id
+                            data-status="active"
+                            class="badge badge-danger"
+                        ) Dừng hoạt động
             td
-                a(
-                    href=`/${ADMIN_PATH}/product-category/edit/${item.id}`
-                    class="btn btn-warning btn-sm"
-                ) Sửa
-                button(
-                    class="btn btn-danger btn-sm ml-1"
-                    button-delete
-                    data-id=item.id
-                ) Xóa
-                a(
-                    href=`/${ADMIN_PATH}/product-category/detail/${item.id}`
-                    class="btn btn-info btn-sm ml-1"
-                ) Chi tiết
+                p #{item.createBy.fullName}
+                p
+                    if item.createBy.fullName
+                        | #{moment(item.createdAt).format("DD/MM/YYYY")}
+                        br
+                        | #{moment(item.createdAt).format("HH:mm:ss")}
+                    else
+                        |
+            td
+                p #{item.updateBy.fullName}
+                p
+                    if item.updateBy.fullName
+                        | #{moment(item.updatedAt).format("DD/MM/YYYY")}
+                        br
+                        | #{moment(item.updatedAt).format("HH:mm:ss")}
+                    else
+                        |
+            td
+                if(role.permissions.includes("product-category_edit"))
+                    a(
+                        href=`/${ADMIN_PATH}/product-category/edit/${item.id}`
+                        class="btn btn-warning btn-sm"
+                    ) Sửa
+                if(role.permissions.includes("product-category_delete"))
+                    button(
+                        class="btn btn-danger btn-sm ml-1"
+                        button-delete
+                        data-id=item.id
+                    ) Xóa
+                if(role.permissions.includes("product-category_view"))
+                    a(
+                        href=`/${ADMIN_PATH}/product-category/detail/${item.id}`
+                        class="btn btn-info btn-sm ml-1"
+                    ) Chi tiết
         if item.children && item.children.length > 0
             +table-tree(item.children, level + 1)
 

@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { create } = require("./product.image.model");
 
 const accountSchema = new mongoose.Schema(
     {
@@ -14,7 +15,27 @@ const accountSchema = new mongoose.Schema(
             type: Boolean,
             default: false,
         },
-        deletedAt: Date,
+        createBy: {
+            account_id: String,
+            createAt: {
+                type: Date,
+                default: Date.now,
+            },
+        },
+        updateBy: {
+            account_id: String,
+            updateAt: {
+                type: Date,
+                default: Date.now,
+            },
+        },
+        deletedBy: {
+            account_id: String,
+            deletedAt: {
+                type: Date,
+                default: Date.now,
+            },
+        },
     },
     {
         timestamps: true,

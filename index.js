@@ -8,6 +8,7 @@ const bodyParser = require("body-parser");
 const flash = require("express-flash");
 const cookieParser = require("cookie-parser");
 const expressSession = require("express-session");
+const moment = require("moment");
 const systemConfig = require("./config/system");
 const path = require('path');
 dotenv.config();
@@ -29,6 +30,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use('/tinymce', express.static(path.join(__dirname, 'node_modules', 'tinymce')));
 
 app.locals.ADMIN_PATH = systemConfig.ADMIN_PATH;
+app.locals.moment = moment;
 //Set flash
 app.use(cookieParser(process.env.SESSION_SECRET));
 app.use(expressSession({

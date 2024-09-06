@@ -3,19 +3,19 @@
         ul 
             li
                 a(href=`/${ADMIN_PATH}/dashboard`) Tổng quan
-
+            if(role.permissions.includes("products_view"))
                 li
                     a(href=`/${ADMIN_PATH}/products`) Sản phẩm
-
+            if(role.permissions.includes("product-category_view"))
                 li
                     a(href=`/${ADMIN_PATH}/product-category`) Danh mục sản phẩm
-
+            if(role.permissions.includes("roles_view"))
                 li
                     a(href=`/${ADMIN_PATH}/roles`) Nhóm quyền
-
+            if(role.permissions.includes("roles_permissions"))
                 li
                     a(href=`/${ADMIN_PATH}/roles/permissions`) Phân quyền
-
+            if(role.permissions.includes("accounts_view"))
                 li
                     a(href=`/${ADMIN_PATH}/accounts`) Tài khoản
             li

@@ -18,5 +18,9 @@ router.put("/edit/:id", upload.single('thumbnail'), validation.editProduct, prod
 
 router.delete("/delete/:id", productCategoryController.delete);
 
+router.patch("/change-multi", productCategoryController.changeMulti);
+
+router.patch("/change-status/:status/:id", productCategoryController.changeStatus);
+
 
 module.exports = router;

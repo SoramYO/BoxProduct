@@ -9,10 +9,11 @@ block main
             .row
                 .col-8
                 .col-4.text-right
-                    a(
-                        href=`/${ADMIN_PATH}/roles/create`
-                        class="btn btn-outline-success"
-                    ) + Thêm mới
+                    if(role.permissions.includes("roles_create"))
+                        a(
+                            href=`/${ADMIN_PATH}/roles/create`
+                            class="btn btn-outline-success"
+                        ) + Thêm mới
 
             table(
                 class="table table-hover table-sm"
@@ -22,6 +23,8 @@ block main
                         th STT
                         th Nhóm quyền
                         th Mô tả ngắn
+                        th Tạo bởi
+                        th Người sửa cuối
                         th Hành động
 
                 tbody
@@ -31,18 +34,34 @@ block main
                                 td #{index + 1}
                                 td #{item.title}
                                 td #{item.description}
+                                td 
+                                    p #{item.createdBy.fullName}
+                                    p
+                                        if item.createdBy.fullName
+                                            | #{moment(item.createdAt).format("DD/MM/YYYY")}
+                                            br
+                                            | #{moment(item.createdAt).format("HH:mm:ss")}
+                                        else
+                                            |
+                                td 
+                                    p #{item.updatedBy.fullName}
+                                    p
+                                        if item.updatedBy.fullName
+                                            | #{moment(item.updatedAt).format("DD/MM/YYYY")}
+                                            br
+                                            | #{moment(item.updatedAt).format("HH:mm:ss")}
+                                        else
+                                            |
                                 td
-                                    a(
-                                        class="btn btn-secondary btn-sm"
-                                        href=`/${ADMIN_PATH}/roles/detail/${item.id}`
-                                    ) Chi tiết
-                                    a(
-                                        class="btn btn-warning btn-sm ml-1"
-                                        href=`/${ADMIN_PATH}/roles/edit/${item.id}`
-                                    ) Sửa
-                                    button(
-                                        class="btn btn-danger btn-sm ml-1"
-                                    ) Xóa
+                                    if(role.permissions.includes("roles_edit"))
+                                        a(
+                                            class="btn btn-warning btn-sm ml-1"
+                                            href=`/${ADMIN_PATH}/roles/edit/${item.id}`
+                                        ) Sửa
+                                    if(role.permissions.includes("roles_delete"))
+                                        button(
+                                            class="btn btn-danger btn-sm ml-1"
+                                        ) Xóa
                     else
                         tr
                             td(colspan="4" class="text-center") Chưa có nhóm quyền nào được tạo.

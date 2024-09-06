@@ -4,7 +4,7 @@ block main
     h1(class="mb-4") Chỉnh sửa nhóm quyền
 
     form(
-        action=`/${ADMIN_PATH}/roles/edit/${role.id}?_method=PUT`
+        action=`/${ADMIN_PATH}/roles/edit/${roleEdit.id}?_method=PUT`
         method="POST"
     )
         div(class="form-group")
@@ -15,7 +15,7 @@ block main
                 id="title"
                 name="title"
                 required
-                value=role.title
+                value=roleEdit.title
             )
         div(class="form-group")
             label(for="desc") Mô tả
@@ -24,7 +24,7 @@ block main
                 class="form-control"
                 id="desc"
                 name="description"
-                value=role.description
+                value=roleEdit.description
             )
         div(class="form-group")
             button(

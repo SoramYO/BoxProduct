@@ -1,11 +1,25 @@
 const Role = require("../../models/role.model");
-const systemConfig = require('../../config/system')
+const systemConfig = require('../../config/system');
+const Account = require("../../models/account.model");
 
 module.exports.index = async (req, res) => {
     let find = {
         deleted: false,
     };
     const roles = await Role.find(find).sort({ position: 'asc' });
+    for (const role of roles) {
+        const account = await Account.findById(_id = role.createdBy.account_id);
+        if (account) {
+            role.createdBy.fullName = account.fullName;
+        }
+    }
+    for (const role of roles) {
+        const account = await Account.findById(_id = role.updatedBy.account_id);
+        if (account) {
+            role.updatedBy.fullName = account.fullName;
+        }
+    }
+
     res.render("admin/pages/roles/index", {
         pageTitle: "Danh sách quyền",
         roles: roles,
@@ -25,6 +39,10 @@ module.exports.createRole = async (req, res) => {
             title: req.body.title,
             description: req.body.description,
             permissions: req.body.permissions,
+            createdBy: {
+                account_id: res.locals.user._id,
+                createAt: Date.now()
+            }
         });
 
         await role.save();
@@ -42,16 +60,20 @@ module.exports.edit = async (req, res) => {
     const role = await Role.findById(req.params.id);
     res.render("admin/pages/roles/edit", {
         pageTitle: "Sửa quyền",
-        role: role,
+        roleEdit: role,
     });
 }
 // [PUT] /admin/roles/edit/:id
 module.exports.update = async (req, res) => {
     try {
         const role = await Role.findById(req.params.id);
+
         role.title = req.body.title;
         role.description = req.body.description;
-        role.permissions = req.body.permissions;
+        role.updatedBy = {
+            account_id: res.locals.user._id,
+            updateAt: Date.now()
+        };
 
         await role.save();
 
@@ -85,7 +107,11 @@ module.exports.permissionsPatch = async (req, res) => {
             _id: role.id,
             deleted: false
         }, {
-            permissions: role.permissions
+            permissions: role.permissions,
+            updatedBy: {
+                account_id: res.locals.user._id,
+                updateAt: Date.now()
+            }
         });
     }
 
